@@ -5,7 +5,6 @@ from datetime import datetime
 import time
 import openpyxl
 
-# Konfiguration
 API_ENDPOINT = "https://api.mobidata-bw.de/sharing/gbfs/regiorad_stuttgart/station_status"
 STATION_IDS = [
     "CAB:Station:958219cd-8009-45b6-8a04-1cc4ae763307",

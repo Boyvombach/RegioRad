@@ -2,11 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-# Pfad zu den Excel-Tabellen
 data_excel_file_path = 'station_data_analysis.xlsx'
 stations_excel_file_path = 'MobiData API - ID.xlsx'
 
-# Lade die Stationsnamen und IDs
 stations_data = pd.read_excel(stations_excel_file_path, usecols="B:C", header=2)
 id_to_name = pd.Series(stations_data['Name / Beschreibung'].values, index=stations_data['ID']).to_dict()
 
