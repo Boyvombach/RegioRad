@@ -1,4 +1,5 @@
 import requests
+import os
 import pandas as pd
 from datetime import datetime
 import time
@@ -26,7 +27,6 @@ STATION_IDS = [
 excel_file_path = 'station_data_analysis.xlsx'
 
 def fetch_and_filter_data():
-    """Abrufen und Filtern der Daten für die vorgegebenen Station-IDs."""
     response = requests.get(API_ENDPOINT)
     if response.status_code == 200:
         data = response.json()
@@ -37,24 +37,28 @@ def fetch_and_filter_data():
         return []
 
 def save_data_to_csv(data):
-    """Speichert die gefilterten Daten in einer neuen CSV-Datei."""
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     csv_file_path = f'station_data_{timestamp}.csv'
     dataframe = pd.DataFrame(data)
+    dataframe = dataframe[['station_id', 'num_bikes_available', 'last_reported']]
     dataframe['timestamp'] = datetime.now()
     dataframe.to_csv(csv_file_path, index=False)
     print(f"Daten in {csv_file_path} gespeichert.")
     return csv_file_path
 
+
 def append_csv_to_excel(csv_file_path):
-    """Fügt CSV-Daten in die Excel-Tabelle ein."""
     data = pd.read_csv(csv_file_path)
     with pd.ExcelWriter(excel_file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-        data.to_excel(writer, index=False, sheet_name='Station Data', startrow=writer.sheets['Station Data'].max_row)
-    print(f"Daten aus {csv_file_path} in {excel_file_path} übertragen.")
+        if writer.sheets['Station Data'].max_row > 1:
+            data.to_excel(writer, index=False, sheet_name='Station Data', startrow=writer.sheets['Station Data'].max_row, header=False)
+        else:
+            data.to_excel(writer, index=False, sheet_name='Station Data', startrow=writer.sheets['Station Data'].max_row)
+    os.remove(csv_file_path)
+    print(f"Daten aus {csv_file_path} in {excel_file_path} übertragen und CSV gelöscht.")
+
 
 def main():
-    """Hauptfunktion zur Ausführung der Datenabfrage, -speicherung und Konvertierung."""
     while True:
         filtered_data = fetch_and_filter_data()
         if filtered_data:
@@ -62,8 +66,8 @@ def main():
             append_csv_to_excel(csv_file_path)
         else:
             print("Keine Daten für die vorgegebenen Station-IDs gefunden.")
-        print("Warte für eine Stunde bis zur nächsten Abfrage.")
-        time.sleep(3600)  # Wartet eine Stunde bis zum nächsten Abruf
+        print("Warte 15 Minuten bis zur nächsten Abfrage.")
+        time.sleep(900)
 
 if __name__ == "__main__":
     main()
