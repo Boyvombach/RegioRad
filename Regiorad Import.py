@@ -65,8 +65,8 @@ def main():
             append_csv_to_excel(csv_file_path)
         else:
             print("Keine Daten für die vorgegebenen Station-IDs gefunden.")
-        print("Warte eine Stunde bis zur nächsten Abfrage.")
-        time.sleep(3600 )
+        print("Warte 15 min bis zur nächsten Abfrage.")
+        time.sleep(900)
 
 if __name__ == "__main__":
     main()
